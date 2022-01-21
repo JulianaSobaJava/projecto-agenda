@@ -1,0 +1,60 @@
+<%Controle de Fluxo(if, for ...%>
+<%= Imprime escapando caracteres, ou seja mostra o que está para se executar%>
+<%= Imprime não escapando caracteres, ou seja executar%>
+<%# Comentário%>
+<%include('Caminho/Arquivo');%>
+
+<% if (alguma coisa){%>
+<%= exibe alguma coisa, ou seja executar%>
+<%}else{%>
+<%=Tudo bem?%>
+<%}%>
+
+
+
+const ContactoModel = mongoose.model('Contacto', ContactoSchema);
+
+class Contacto{
+    constructor(body){
+        this.body = body;
+        this.errors = [];
+        this.contacto = null;
+    };
+
+    async buscaPorId(id){
+      if(typeof id !== 'string') return;
+      const user = await ContactoModel.findById(id);
+      return user;
+    };
+
+   async register(){
+        this.valida();
+        if(this.errors.length > 0)return;
+        this.contacto = await ContactoModel.create(this.body);
+    };
+
+    valida(){
+        //validação
+        this.cleanUp();
+        //O email
+        if(this.body.email && !validator.isEmail(this.body.email))this.errors.push('Email inválido');
+        if(!this.body.nome) this.errors.push('Nome é um campo obrigatório');
+        if(!this.body.email && !this.body.telefone){
+            this.errors.push('Pelo menos um contacto precisa ser enviado: email ou telefone');
+        }
+  
+    };
+    cleanUp(){
+        for(const key in this.body){
+          if(typeof this.body[key] !== 'string'){
+              this.body[key] = '';
+          }
+        }
+
+        this.body = {
+            nome: this.body.nome,
+            sobrenome: this.body.sobrenome,
+            email: this.body.email,
+            telefone: this.body.telefone
+        }
+    };
